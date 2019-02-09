@@ -1,3 +1,8 @@
+# GAlego project: ignore output file. Because it's huge. really huge.
+Lego_Output.txt
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -89,6 +94,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.idea
 
 # Spyder project settings
 .spyderproject
