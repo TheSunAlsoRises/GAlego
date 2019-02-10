@@ -5,8 +5,7 @@ import copy
 # Define the size of the boards
 N = 10
 # Define the size of the population : must be an even number
-P = 200
-
+P = 70
 
 def main():
 
@@ -82,10 +81,16 @@ class Board:
     # Calculate the fitting function: the number of occupied cells in the board
     def fittingFunction(self):
         self.capacity = 0
+        fullSequency = 0
         for row in range(N):
             for column in range(N):
+                if self.board[row][column] == "":
+                    fullSequency -= 1
                 if self.board[row][column] != "":
-                    self.capacity += 1
+                    fullSequency += 2
+                    self.capacity += fullSequency
+                if (column == 0 or column == N) and (self.board[row][column] != ""):
+                    self.capacity += 5
         return self.capacity
 
     def printBoard(self):
@@ -101,7 +106,7 @@ class Board:
         # Cut the last'\n'
         boardString = boardString[:-1]
         print(boardString)
-        print("Board's fitting function value: "+ str(self.capacity))
+        print("Board's fitting function value: " + str(self.capacity))
 
 
 # A population of random lego boards
@@ -129,7 +134,7 @@ class Population:
 
             # Fill the new board with random bricks:
             # For random amount of bricks in this board (1-10)
-            for index in range(random.randint(3, 10)):
+            for index in range(random.randint(3, 45)):
                 # Call a random function from the drawing functions, for some random position on the board
                 randFunc = random.randint(0, 2)
                 randX = random.randint(0, N-1)
@@ -146,6 +151,7 @@ class Population:
         print("The total fitting value of the population is: " + str(self.fittingSum))
 
         noProgressTimes = 0
+        maxFit = 0
         while True:
             self.generation += 1
             print("Generation: {0}".format(self.generation))
@@ -154,14 +160,17 @@ class Population:
             self.fittingSum = 0
             for i in range(P):
                 print("Board #{0}".format(i+1))
-                self.population[i].printBoard()
-                self.fittingSum += self.population[i].fittingFunction()
+               # self.population[i].printBoard()
+                fitnum = self.population[i].fittingFunction()
+                self.fittingSum += fitnum
+                if fitnum > maxFit:
+                    maxFit = fitnum
             print("The total fitting value of the population is: " + str(self.fittingSum))
             if prevFittingSum == self.fittingSum:
                 noProgressTimes += 1
             else:
                 noProgressTimes = 0
-            if noProgressTimes > 50:
+            if noProgressTimes > 50 or maxFit == N*N :
                 # choose the best board
                 self.population.sort(key=lambda x: x.fittingFunction(), reverse=True)
                 print("Board with the best fitness is: \n")
@@ -177,10 +186,10 @@ class Population:
     def checkFullParts(self, i, j, parent):
         for index in range(j):
             # add here all elements that have more than one row
-            if (parent.board[i][index] == 'c1'):
+            if parent.board[i][index] == 'c1':
                 return False
         for index in range(j, N):
-            if (parent.board[i][index] == 'c4'):
+            if parent.board[i][index] == 'c4':
                 return False
         return True
 
@@ -189,18 +198,27 @@ class Population:
                 parent.board[randX][randY] == 'a1' or
                 parent.board[randX][randY] == 'b1' or
                 parent.board[randX][randY] == 'c1'):
-            if (self.checkFullParts(randX, randY, parent)):
+            if self.checkFullParts(randX, randY, parent):
                 return True
         return False
 
     def concatChromosomeParts(self, randX, randY, child, parent):
         for j in range(randY, N):
             child[randX][j] = parent[randX][j]
-        if ((randX + 1) <= N):
+        if (randX + 1) <= N:
             for i in range(randX + 1, N):
                 for j in range(N):
                     child[i][j] = parent[i][j]
         return child
+
+    def tossMutation(self):
+        if random.randint(0,10)==5:
+            return True
+        else:
+            return False
+    #################################
+    #def mutation(self):
+
 
     def crossover(self):
         nextGeneration = []
