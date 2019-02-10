@@ -59,6 +59,14 @@ class Board:
         else:
             return -1
 
+    # Draws a two dots brick:     [..]
+    def drawD(self, i, j):
+        # Check if the brick can fit in this position (not too close to the end of the row)
+        if j < N-2:
+            Board.drawBrick(self, i, j, 1, 2, 'd')
+        else:
+            return -1
+
     # Draws a brick at a given starting point, if not occupied. Also gets: length, width, and brick type
     # Types a, b, c... are bricks, and '""' (empty string) means deletion
     def drawBrick(self, startX, startY, lengthX, widthY, type):
@@ -88,10 +96,10 @@ class Board:
                 if self.board[row][column] == "":
                     fullSequency -= 1
                 if self.board[row][column] != "":
-                    self.capacity +=1
+                    self.capacity += 1
                     fullSequency += 2
                     fitness += fullSequency
-                if (column == 0 or column == N) and (self.board[row][column] != ""):
+                if (column == 0 or column == (N-1)) and (self.board[row][column] != ""):
                     fitness += 5
         return fitness
 
@@ -125,6 +133,7 @@ class Population:
         self.drawingFunctions.insert(0, Board.drawA)
         self.drawingFunctions.insert(1, Board.drawB)
         self.drawingFunctions.insert(2, Board.drawC)
+        self.drawingFunctions.insert(3, Board.drawD)
 
         self.population = []
         # Create an array of 'Board' objects that will be the population
@@ -136,9 +145,9 @@ class Population:
 
             # Fill the new board with random bricks:
             # For random amount of bricks in this board (1-10)
-            for index in range(random.randint(3, 45)):
+            for index in range(random.randint(5, 45)):
                 # Call a random function from the drawing functions, for some random position on the board
-                randFunc = random.randint(0, 2)
+                randFunc = random.randint(0, 3)
                 randX = random.randint(0, N-1)
                 randY = random.randint(0, N-1)
                 self.drawingFunctions[randFunc](new_board, randX, randY)
@@ -162,6 +171,8 @@ class Population:
             for i in range(P):
                 print("Board #{0}".format(i+1))
                 self.population[i].printBoard()
+                fitnum = self.population[i].fittingFunction()
+                self.fittingSum += fitnum
             print("The total fitting value of the population is: " + str(self.fittingSum))
             if prevFittingSum == self.fittingSum:
                 noProgressTimes += 1
