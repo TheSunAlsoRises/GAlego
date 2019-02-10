@@ -3,9 +3,9 @@ import sys
 import copy
 
 # Define the size of the boards
-N = 15
-# Define the size of the population
-P = 1000
+N = 10
+# Define the size of the population : must be an even number
+P = 200
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
     sys.stdout = open('Lego_Output.txt', 'w')
 
     # Create the population and start the breeding process
-    Population(P)
+    Population()
 
     # Restore standard output to screen
     sys.stdout = oldstdout
@@ -61,6 +61,7 @@ class Board:
             return -1
 
     # Draws a brick at a given starting point, if not occupied. Also gets: length, width, and brick type
+    # Types a, b, c... are bricks, and '""' (empty string) means deletion
     def drawBrick(self, startX, startY, lengthX, widthY, type):
         # Check:
         for row in range(startX, startX + lengthX):
@@ -68,13 +69,17 @@ class Board:
                 if self.board[row][column] != '':
                     return -1
         # Draw:
-        k = 1
+        if type != "":
+            k = 1
+        else:
+            k = ""
         for row in range(startX, startX + lengthX):
             for column in range(startY, startY + widthY):
                 self.board[row][column] = type + str(k)
-                k += 1
+                if k != "":
+                    k += 1
 
-    # Calculate the fitting function: the number of ocupied cells in the board
+    # Calculate the fitting function: the number of occupied cells in the board
     def fittingFunction(self):
         self.capacity = 0
         for row in range(N):
@@ -107,7 +112,7 @@ class Population:
     fittingSum = 0
     generation = 0
 
-    def __init__(self, populationSize):
+    def __init__(self):
         # Set a list of the possible drawing functions
         self.drawingFunctions = []
         self.drawingFunctions.insert(0, Board.drawA)
@@ -115,10 +120,10 @@ class Population:
         self.drawingFunctions.insert(2, Board.drawC)
 
         self.population = []
-        # Create an aray of 'Board' objects that will be the population
-        print("The random initial population contains " + str(populationSize) + " boards:")
-        for index in range(populationSize):
-            print("\nBoard #" + str(index + 1) + ":")
+        # Create an array of 'Board' objects that will be the population
+        print("The random initial population contains " + str(P) + " boards:")
+        for individual in range(P):
+            print("\nBoard #" + str(individual + 1) + ":")
             # Create a new board
             new_board = Board()
 
@@ -237,7 +242,6 @@ class Population:
                 nextGeneration.append(father)
 
         return nextGeneration
-
 
 
 # Upon run call 'main'
