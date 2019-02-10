@@ -80,20 +80,20 @@ class Board:
     # -1 for an empty cell, +2 for occupied cell, +5 for occupied cell at the sides
     def fittingFunction(self):
         self.capacity = 0
-        self.fullSequency = 0
+        fitness = 0
+        fullSequency = 0
+
         for row in range(N):
             for column in range(N):
                 if self.board[row][column] == "":
                     self.fullSequency -= 1
                 if self.board[row][column] != "":
-                    self.capacity += 1
-                    self.fullSequency += 2
-                #if self.board[row][column] != "" \
-                 #       and ((column < N-1 and self.board[row][column+1] != "") or (column > 0 and self.board[row][column-1] != "")):
-                  #  self.fullSequency += 3
-                if (column == 0 or column == N-1) and (self.board[row][column] != ""):
-                    self.fullSequency += 5
-        return self.fullSequency
+                    self.capacity +=1
+                    fullSequency += 2
+                    fitness += fullSequency
+                if (column == 0 or column == N) and (self.board[row][column] != ""):
+                    fitness += 5
+        return fitness
 
     def printBoard(self):
         boardString = ""
@@ -108,7 +108,7 @@ class Board:
         # Cut the last'\n'
         boardString = boardString[:-1]
         print(boardString)
-        print("Board's fitting function value: " + str(self.fullSequency) + ",  Board's capacity:" + str(self.capacity))
+        print("Board's capacity is {0}% ".format(self.capacity*100/(N*N)))
 
 
 # A population of random lego boards
@@ -153,7 +153,6 @@ class Population:
         print("The total fitting value of the population is: " + str(self.fittingSum))
 
         noProgressTimes = 0
-        maxFit = 0
         while True:
             self.generation += 1
             print("Generation: {0}".format(self.generation))
@@ -163,17 +162,14 @@ class Population:
             for i in range(P):
                 print("Board #{0}".format(i+1))
                 self.population[i].printBoard()
-                fitnum = self.population[i].fittingFunction()
-                self.fittingSum += fitnum
-                if fitnum > maxFit:
-                    maxFit = fitnum
+
             print("The total fitting value of the population is: " + str(self.fittingSum))
             if prevFittingSum == self.fittingSum:
                 noProgressTimes += 1
             else:
                 noProgressTimes = 0
-            # maxfit isn't capacity now
-            if noProgressTimes > 50: #or maxFit == N*N :
+
+            if noProgressTimes > 50:
                 # choose the best board
                 self.population.sort(key=lambda x: x.fittingFunction(), reverse=True)
                 print("\nBoard with the best fitness is: \n")
