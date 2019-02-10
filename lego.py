@@ -5,7 +5,7 @@ import copy
 # Define the size of the boards
 N = 10
 # Define the size of the population
-P = 50
+P = 70
 
 
 def main():
@@ -77,10 +77,16 @@ class Board:
     # Calculate the fitting function: the number of ocupied cells in the board
     def fittingFunction(self):
         self.capacity = 0
+        fullSequency = 0
         for row in range(N):
             for column in range(N):
+                if self.board[row][column] == "":
+                    fullSequency -= 1
                 if self.board[row][column] != "":
-                    self.capacity += 1
+                    fullSequency += 2
+                    self.capacity += fullSequency
+                if (column == 0 or column == N) and (self.board[row][column] != ""):
+                    self.capacity += 5
         return self.capacity
 
     def printBoard(self):
@@ -124,7 +130,7 @@ class Population:
 
             # Fill the new board with random bricks:
             # For random amount of bricks in this board (1-10)
-            for index in range(random.randint(3, 25)):
+            for index in range(random.randint(3, 45)):
                 # Call a random function from the drawing functions, for some random position on the board
                 randFunc = random.randint(0, 2)
                 randX = random.randint(0, N-1)
@@ -150,7 +156,7 @@ class Population:
             self.fittingSum = 0
             for i in range(P):
                 print("Board #{0}".format(i+1))
-                self.population[i].printBoard()
+               # self.population[i].printBoard()
                 fitnum = self.population[i].fittingFunction()
                 self.fittingSum += fitnum
                 if fitnum > maxFit:
@@ -200,6 +206,15 @@ class Population:
                 for j in range(N):
                     child[i][j] = parent[i][j]
         return child
+
+    def tossMutation(self):
+        if random.randint(0,10)==5:
+            return True
+        else:
+            return False
+    #################################
+    #def mutation(self):
+
 
     def crossover(self):
         nextGeneration = []
