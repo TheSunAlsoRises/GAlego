@@ -7,6 +7,7 @@ N = 10
 # Define the size of the population : must be an even number
 P = 70
 
+
 def main():
 
     # Redirect standard output to file (created in project directory). Save original channel to restore.
@@ -27,6 +28,7 @@ class Board:
 
     board = None
     capacity = 0
+    fullSequency = 0
 
     # Constructor:
     def __init__(self):
@@ -68,30 +70,30 @@ class Board:
                 if self.board[row][column] != '':
                     return -1
         # Draw:
-        if type != "":
-            k = 1
-        else:
-            k = ""
+        k = 1
         for row in range(startX, startX + lengthX):
             for column in range(startY, startY + widthY):
                 self.board[row][column] = type + str(k)
-                if k != "":
-                    k += 1
+                k += 1
 
-    # Calculate the fitting function: the number of occupied cells in the board
+    # Calculate the fitting function:
+    # -1 for an empty cell, +2 for occupied cell, +5 for occupied cell at the sides
     def fittingFunction(self):
         self.capacity = 0
-        fullSequency = 0
+        self.fullSequency = 0
         for row in range(N):
             for column in range(N):
                 if self.board[row][column] == "":
-                    fullSequency -= 1
+                    self.fullSequency -= 1
                 if self.board[row][column] != "":
-                    fullSequency += 2
-                    self.capacity += fullSequency
-                if (column == 0 or column == N) and (self.board[row][column] != ""):
-                    self.capacity += 5
-        return self.capacity
+                    self.capacity += 1
+                    self.fullSequency += 2
+                #if self.board[row][column] != "" \
+                 #       and ((column < N-1 and self.board[row][column+1] != "") or (column > 0 and self.board[row][column-1] != "")):
+                  #  self.fullSequency += 3
+                if (column == 0 or column == N-1) and (self.board[row][column] != ""):
+                    self.fullSequency += 5
+        return self.fullSequency
 
     def printBoard(self):
         boardString = ""
@@ -106,7 +108,7 @@ class Board:
         # Cut the last'\n'
         boardString = boardString[:-1]
         print(boardString)
-        print("Board's fitting function value: " + str(self.capacity))
+        print("Board's fitting function value: " + str(self.fullSequency) + ",  Board's capacity:" + str(self.capacity))
 
 
 # A population of random lego boards
@@ -160,7 +162,7 @@ class Population:
             self.fittingSum = 0
             for i in range(P):
                 print("Board #{0}".format(i+1))
-               # self.population[i].printBoard()
+                self.population[i].printBoard()
                 fitnum = self.population[i].fittingFunction()
                 self.fittingSum += fitnum
                 if fitnum > maxFit:
@@ -170,10 +172,11 @@ class Population:
                 noProgressTimes += 1
             else:
                 noProgressTimes = 0
-            if noProgressTimes > 50 or maxFit == N*N :
+            # maxfit isn't capacity now
+            if noProgressTimes > 50: #or maxFit == N*N :
                 # choose the best board
                 self.population.sort(key=lambda x: x.fittingFunction(), reverse=True)
-                print("Board with the best fitness is: \n")
+                print("\nBoard with the best fitness is: \n")
                 self.population[0].printBoard()
                 break
 
@@ -216,7 +219,7 @@ class Population:
             return True
         else:
             return False
-    #################################
+
     #def mutation(self):
 
 
