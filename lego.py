@@ -7,6 +7,7 @@ N = 10
 # Define the size of the population : must be an even number
 P = 70
 
+
 def main():
 
     # Redirect standard output to file (created in project directory). Save original channel to restore.
@@ -76,21 +77,19 @@ class Board:
                 if self.board[row][column] != '':
                     return -1
         # Draw:
-        if type != "":
-            k = 1
-        else:
-            k = ""
+        k = 1
         for row in range(startX, startX + lengthX):
             for column in range(startY, startY + widthY):
                 self.board[row][column] = type + str(k)
-                if k != "":
-                    k += 1
+                k += 1
 
-    # Calculate the fitting function: the number of occupied cells in the board
+    # Calculate the fitting function:
+    # -1 for an empty cell, +2 for occupied cell, +5 for occupied cell at the sides
     def fittingFunction(self):
         self.capacity = 0
         fitness = 0
         fullSequency = 0
+
         for row in range(N):
             for column in range(N):
                 if self.board[row][column] == "":
@@ -178,10 +177,11 @@ class Population:
                 noProgressTimes += 1
             else:
                 noProgressTimes = 0
+
             if noProgressTimes > 50:
                 # choose the best board
                 self.population.sort(key=lambda x: x.fittingFunction(), reverse=True)
-                print("Board with the best fitness is: \n")
+                print("\nBoard with the best fitness is: \n")
                 self.population[0].printBoard()
                 break
 
@@ -224,7 +224,7 @@ class Population:
             return True
         else:
             return False
-    #################################
+
     #def mutation(self):
 
 
