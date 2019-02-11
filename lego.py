@@ -5,7 +5,7 @@ import copy
 # Define the size of the boards
 N = 10
 # Define the size of the population : must be an even number
-P = 70
+P = 100
 
 
 def main():
@@ -63,8 +63,24 @@ class Board:
     # Draws a two dots brick:     [..]
     def drawD(self, i, j):
         # Check if the brick can fit in this position (not too close to the end of the row)
-        if j < N-2:
+        if j < N-1:
             Board.drawBrick(self, i, j, 1, 2, 'd')
+        else:
+            return -1
+
+    # Draws a four dots brick:       [::]
+    def drawE(self, i, j):
+        # Check if the brick can fit in this position (not too close to the end of the row, and not in the last row)
+        if j < N-1 and i < N-1:
+            Board.drawBrick(self, i, j, 2, 2, 'e')
+        else:
+            return -1
+
+    # Draws a four dots brick:     [....]
+    def drawF(self, i, j):
+        # Check if the brick can fit in this position (not too close to the end of the row)
+        if j < N-3:
+            Board.drawBrick(self, i, j, 1, 4, 'f')
         else:
             return -1
 
@@ -133,6 +149,8 @@ class Population:
         self.drawingFunctions.insert(1, Board.drawB)
         self.drawingFunctions.insert(2, Board.drawC)
         self.drawingFunctions.insert(3, Board.drawD)
+        self.drawingFunctions.insert(3, Board.drawE)
+        self.drawingFunctions.insert(3, Board.drawF)
 
         self.population = []
         # Create an array of 'Board' objects that will be the population
@@ -144,9 +162,9 @@ class Population:
 
             # Fill the new board with random bricks:
             # For random amount of bricks in this board (1-10)
-            for index in range(random.randint(5, 45)):
+            for index in range(random.randint(5, 60)):
                 # Call a random function from the drawing functions, for some random position on the board
-                randFunc = random.randint(0, 3)
+                randFunc = random.randint(0, 5)
                 randX = random.randint(0, N-1)
                 randY = random.randint(0, N-1)
                 self.drawingFunctions[randFunc](new_board, randX, randY)
@@ -177,8 +195,7 @@ class Population:
                 noProgressTimes += 1
             else:
                 noProgressTimes = 0
-
-            if noProgressTimes > 50:
+            if noProgressTimes > 100:
                 # choose the best board
                 self.population.sort(key=lambda x: x.fittingFunction(), reverse=True)
                 print("\nBoard with the best fitness is: \n")
@@ -194,10 +211,10 @@ class Population:
     def checkFullParts(self, i, j, parent):
         for index in range(j):
             # add here all elements that have more than one row
-            if parent.board[i][index] == 'c1':
+            if parent.board[i][index] == 'c1' or parent.board[i][index] == 'e1':
                 return False
         for index in range(j, N):
-            if parent.board[i][index] == 'c4':
+            if parent.board[i][index] == 'c4'or parent.board[i][index] == 'e3':
                 return False
         return True
 
@@ -205,7 +222,10 @@ class Population:
         if (parent.board[randX][randY] == '' or
                 parent.board[randX][randY] == 'a1' or
                 parent.board[randX][randY] == 'b1' or
-                parent.board[randX][randY] == 'c1'):
+                parent.board[randX][randY] == 'c1' or
+                parent.board[randX][randY] == 'd1' or
+                parent.board[randX][randY] == 'e1' or
+                parent.board[randX][randY] == 'f1'):
             if self.checkFullParts(randX, randY, parent):
                 return True
         return False
