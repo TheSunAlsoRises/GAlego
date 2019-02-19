@@ -68,11 +68,11 @@ def gui(board):
                     elif brickType == 2:    # c
                         color = (0, 0, 255)
                     elif brickType == 3:    # d
-                        color = (150, 0, 0)
+                        color = (255, 255, 0)
                     elif brickType == 4:    # e
-                        color = (0, 150, 0)
+                        color = (0, 255, 255)
                     elif brickType == 5:    # f
-                        color = (0, 0, 150)
+                        color = (255, 0, 255)
 
                 pygame.draw.rect(screen,
                                  color,
