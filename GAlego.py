@@ -3,6 +3,7 @@ import sys
 import copy
 import threading
 import pygame
+import ctypes
 
 # Define the size of the boards
 N = 10
@@ -15,7 +16,7 @@ def main():
     # Redirect standard output to file (created in project directory). Save original channel to restore.
     oldstdout = sys.stdout
     sys.stdout = open('Lego_Output.txt', 'w')
-
+    ctypes.windll.user32.MessageBoxW(0, "Hello Miri,\nOur Genetic Algithm is working hard now.\nPlease press OK and wait. ", "LEGO", 1| 0x40)
     # Create the population and start the breeding process
     population = Population()
 
